@@ -8,6 +8,10 @@ const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    if (!email || !password || !name) {
+      return res.status(400).json({ message: 'Name, email, and password are required' });
+    }
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -33,6 +37,7 @@ const register = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Registration error:', error.message);
     res.status(500).json({ message: 'Registration failed' });
   }
 };
@@ -40,6 +45,10 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
 
     const user = await User.findOne({ email });
 
@@ -64,6 +73,7 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Login error:', error.message);
     res.status(500).json({ message: 'Login failed' });
   }
 };
