@@ -6,6 +6,7 @@ const { Server: IOServer } = require('socket.io');
 const connectDB = require('./config/db');
 const taskRoutes = require('./routes/taskRoutes');
 const authRoutes = require('./routes/authRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.get('/', (_req, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // create HTTP server and attach Socket.io
 const server = http.createServer(app);

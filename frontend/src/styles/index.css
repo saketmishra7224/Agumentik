@@ -144,6 +144,45 @@ a {
   justify-content: space-between;
 }
 
+.analytics-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.analytics-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+}
+
+.analytics-label {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.analytics-card strong {
+  color: #111827;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.analytics-notes {
+  color: #4b5563;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.analytics-notes p {
+  margin: 0;
+}
+
 .task-form {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -296,6 +335,7 @@ a {
 }
 
 @media (max-width: 720px) {
+  .analytics-cards,
   .task-form-row,
   .task-item,
   .task-actions {

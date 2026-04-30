@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchAnalytics } from '../features/analytics/analyticsSlice';
 import {
   createTask,
   deleteTask,
@@ -12,6 +13,7 @@ const statusOptions = ['Pending', 'In Progress', 'Completed'];
 function TasksPage() {
   const dispatch = useDispatch();
   const tasks = useSelector((state) => state.tasks.tasks);
+  const analytics = useSelector((state) => state.analytics);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -22,6 +24,7 @@ function TasksPage() {
 
   useEffect(() => {
     dispatch(fetchTasks());
+    dispatch(fetchAnalytics());
   }, [dispatch]);
 
   const handleChange = (event) => {
@@ -66,10 +69,35 @@ function TasksPage() {
     dispatch(deleteTask(id));
   };
 
+  const mostActiveCategory =
+    analytics.categoryDistribution.length > 0
+      ? analytics.categoryDistribution[0]._id
+      : 'No category yet';
+
   return (
     <main className="page dashboard-page">
       <section className="dashboard-header">
         <h1>Tasks</h1>
+      </section>
+
+      <section className="analytics-cards" aria-label="Task summary">
+        <article className="analytics-card">
+          <span className="analytics-label">Total Tasks</span>
+          <strong>{analytics.totalTasks}</strong>
+        </article>
+        <article className="analytics-card">
+          <span className="analytics-label">Completed Tasks</span>
+          <strong>{analytics.completedTasks}</strong>
+        </article>
+        <article className="analytics-card">
+          <span className="analytics-label">Pending Tasks</span>
+          <strong>{analytics.pendingTasks}</strong>
+        </article>
+      </section>
+
+      <section className="analytics-notes" aria-label="Task insights">
+        <p>You completed {analytics.tasksCompletedToday} tasks today</p>
+        <p>Most active category: {mostActiveCategory}</p>
       </section>
 
       <form className="task-form" onSubmit={handleSubmit}>
