@@ -125,35 +125,46 @@ function TasksPage() {
         {tasks.length === 0 ? (
           <p className="empty-state">No tasks yet.</p>
         ) : (
-          tasks.map((task) => (
-            <article className="task-item" key={task._id}>
-              <div className="task-content">
-                <h2>{task.title}</h2>
-                {task.description && <p>{task.description}</p>}
-                <div className="task-meta">
-                  {task.category && <span>{task.category}</span>}
-                  {task.deadline && <span>{new Date(task.deadline).toLocaleDateString()}</span>}
+          tasks.map((task) => {
+            const isOverdue = task.deadline && new Date(task.deadline).getTime() <= Date.now();
+            const isHighPriority = !isOverdue && Number(task.priority) >= 200;
+
+            return (
+              <article
+                className={`task-item ${isOverdue ? 'overdue' : isHighPriority ? 'high-priority' : ''}`}
+                key={task._id}
+              >
+                <div className="task-content">
+                  <h2>{task.title}</h2>
+                  {task.description && <p>{task.description}</p>}
+                  <div className="task-meta">
+                    {task.category && <span>{task.category}</span>}
+                    {task.deadline && <span>{new Date(task.deadline).toLocaleDateString()}</span>}
+                    <span className={`task-priority ${isOverdue ? 'overdue' : isHighPriority ? 'high' : ''}`}>
+                      Priority: {task.priority}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="task-actions">
-                <select
-                  value={task.status}
-                  onChange={(event) => handleStatusChange(task._id, event.target.value)}
-                >
-                  {statusOptions.map((status) => (
-                    <option value={status} key={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
+                <div className="task-actions">
+                  <select
+                    value={task.status}
+                    onChange={(event) => handleStatusChange(task._id, event.target.value)}
+                  >
+                    {statusOptions.map((status) => (
+                      <option value={status} key={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
 
-                <button type="button" onClick={() => handleDelete(task._id)}>
-                  Delete
-                </button>
-              </div>
-            </article>
-          ))
+                  <button type="button" onClick={() => handleDelete(task._id)}>
+                    Delete
+                  </button>
+                </div>
+              </article>
+            );
+          })
         )}
       </section>
     </main>

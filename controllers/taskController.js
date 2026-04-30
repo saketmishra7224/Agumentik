@@ -1,8 +1,21 @@
 const Task = require('../models/Task');
+const serializeTaskWithPriority = require('../utils/taskResponse');
 
 const getTasks = async (req, res) => {
   const tasks = await Task.find({ user: req.user });
-  res.json(tasks);
+  const currentTime = Date.now();
+
+  const tasksWithPriority = tasks
+    .map((task) => serializeTaskWithPriority(task, currentTime))
+    .sort((leftTask, rightTask) => {
+      if (rightTask.priority !== leftTask.priority) {
+        return rightTask.priority - leftTask.priority;
+      }
+
+      return new Date(leftTask.createdAt) - new Date(rightTask.createdAt);
+    });
+
+  res.json(tasksWithPriority);
 };
 
 const createTask = async (req, res) => {
@@ -17,7 +30,7 @@ const createTask = async (req, res) => {
     user: req.user
   });
 
-  res.status(201).json(task);
+  res.status(201).json(serializeTaskWithPriority(task));
 };
 
 const updateTask = async (req, res) => {
@@ -31,7 +44,7 @@ const updateTask = async (req, res) => {
     return res.status(404).json({ message: 'Task not found' });
   }
 
-  res.json(task);
+  res.json(serializeTaskWithPriority(task));
 };
 
 const deleteTask = async (req, res) => {

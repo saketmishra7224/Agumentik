@@ -6,21 +6,24 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   return response.data;
 });
 
-export const createTask = createAsyncThunk('tasks/createTask', async (taskData) => {
+export const createTask = createAsyncThunk('tasks/createTask', async (taskData, thunkAPI) => {
   const response = await api.post('/tasks', taskData);
+  await thunkAPI.dispatch(fetchTasks());
   return response.data;
 });
 
 export const updateTaskStatus = createAsyncThunk(
   'tasks/updateTaskStatus',
-  async ({ id, status }) => {
+  async ({ id, status }, thunkAPI) => {
     const response = await api.put(`/tasks/${id}`, { status });
+    await thunkAPI.dispatch(fetchTasks());
     return response.data;
   }
 );
 
-export const deleteTask = createAsyncThunk('tasks/deleteTask', async (id) => {
+export const deleteTask = createAsyncThunk('tasks/deleteTask', async (id, thunkAPI) => {
   await api.delete(`/tasks/${id}`);
+  await thunkAPI.dispatch(fetchTasks());
   return id;
 });
 
@@ -36,19 +39,6 @@ const taskSlice = createSlice({
     builder
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.tasks = action.payload;
-      })
-      .addCase(createTask.fulfilled, (state, action) => {
-        state.tasks.push(action.payload);
-      })
-      .addCase(updateTaskStatus.fulfilled, (state, action) => {
-        const task = state.tasks.find((item) => item._id === action.payload._id);
-
-        if (task) {
-          task.status = action.payload.status;
-        }
-      })
-      .addCase(deleteTask.fulfilled, (state, action) => {
-        state.tasks = state.tasks.filter((task) => task._id !== action.payload);
       });
   }
 });

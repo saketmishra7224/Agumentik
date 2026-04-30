@@ -20,6 +20,9 @@ const taskSchema = new mongoose.Schema(
     deadline: {
       type: Date
     },
+    priority: {
+      type: Number
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
