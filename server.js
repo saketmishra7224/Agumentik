@@ -10,7 +10,9 @@ dotenv.config();
 const missingEnv = ['MONGO_URI', 'JWT_SECRET'].filter((key) => !process.env[key]);
 
 if (missingEnv.length > 0) {
-  console.error(`Missing required env values: ${missingEnv.join(', ')}`);
+  console.error(
+    `Missing required env values: ${missingEnv.join(', ')}. Set them in Render for the backend service before starting the app.`
+  );
   process.exit(1);
 }
 
