@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const http = require('http');
+const { Server: IOServer } = require('socket.io');
 const connectDB = require('./config/db');
 const taskRoutes = require('./routes/taskRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -36,11 +38,31 @@ app.get('/', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
+// create HTTP server and attach Socket.io
+const server = http.createServer(app);
+
+const io = new IOServer(server, {
+  cors: {
+    origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
+    credentials: true,
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log('User connected');
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
+// expose io on the app so other modules can emit events
+app.set('io', io);
+
 const PORT = process.env.PORT || 5000;
 let isDbConnected = false;
 
 const startServer = async () => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 

@@ -30,7 +30,14 @@ const createTask = async (req, res) => {
     user: req.user
   });
 
-  res.status(201).json(serializeTaskWithPriority(task));
+  const io = req.app.get('io');
+  const serialized = serializeTaskWithPriority(task, Date.now());
+
+  if (io) {
+    io.emit('taskCreated', serialized);
+  }
+
+  res.status(201).json(serialized);
 };
 
 const updateTask = async (req, res) => {
@@ -44,7 +51,14 @@ const updateTask = async (req, res) => {
     return res.status(404).json({ message: 'Task not found' });
   }
 
-  res.json(serializeTaskWithPriority(task));
+  const io = req.app.get('io');
+  const serialized = serializeTaskWithPriority(task, Date.now());
+
+  if (io) {
+    io.emit('taskUpdated', serialized);
+  }
+
+  res.json(serialized);
 };
 
 const deleteTask = async (req, res) => {
@@ -55,6 +69,13 @@ const deleteTask = async (req, res) => {
 
   if (!task) {
     return res.status(404).json({ message: 'Task not found' });
+  }
+
+  const io = req.app.get('io');
+  const serialized = serializeTaskWithPriority(task, Date.now());
+
+  if (io) {
+    io.emit('taskDeleted', serialized);
   }
 
   res.json({ message: 'Task deleted' });
