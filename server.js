@@ -37,13 +37,26 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 const PORT = process.env.PORT || 5000;
+let isDbConnected = false;
 
 const startServer = async () => {
-  await connectDB();
-
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+
+  const connectWithRetry = async () => {
+    try {
+      await connectDB();
+      isDbConnected = true;
+    } catch (error) {
+      isDbConnected = false;
+      console.error(`MongoDB connection failed: ${error.message}`);
+      console.log('Retrying MongoDB connection in 10 seconds...');
+      setTimeout(connectWithRetry, 10000);
+    }
+  };
+
+  connectWithRetry();
 };
 
 startServer();
